@@ -30,8 +30,10 @@ $routes->setAutoRoute(true);
  */
 
 $routes->get('/', 'BlogController::index');
-$routes->post('/created/blog', 'BlogController::create');
+$routes->post('/created/blog/', 'BlogController::create');
 $routes->add('/blog/(:any)/', 'BlogController::show/$1');
+$routes->add('/update/blog/(:any)', 'BlogController::update/$1');
+$routes->delete('/delete/blog/(:any)', 'BlogController::delete/$1');
 
 
 

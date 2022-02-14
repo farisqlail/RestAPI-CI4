@@ -37,7 +37,7 @@ class BlogController extends BaseController
             $blogModel->insert($data);
             
             $response = [
-                'status' => 201,
+                'status' => 200,
                 'error' => null,
                 'messages' => [
                     'success' => 'Blog successfully created!'
@@ -55,6 +55,52 @@ class BlogController extends BaseController
 
         if ($blogs) {
             return $this->respond($blogs);
+        } else {
+            return $this->failNotFound('Blog dosen`t find!');
+        }
+    }
+
+    public function update($id = null){
+
+        $blogModel = model(Blog::class);
+        // $id = $this->request->getVar('id');
+        $blogs = $blogModel->where('id', $id)->first();
+
+        $data = [
+            'blog_title' => $this->request->getVar('blog_title'),
+            'blog_description' => $this->request->getVar('blog_description')
+        ];
+
+        $blogModel->update($id, $data);
+            
+        $response = [
+            'status' => 200,
+            'error' => null,
+            'messages' => [
+                'success' => 'Blog successfully updated!'
+            ]
+        ];
+
+        return $this->respond($response);
+    }
+
+    public function delete($id = null){
+
+        $blogModel = model(Blog::class);
+        $blogs = $blogModel->where('id', $id)->first();
+
+        if ($blogs) {
+            $blogModel->delete($id);
+
+            $response = [
+                'status' => 200,
+                'error' => null,
+                'messages' => [
+                    'success' => 'Blog successfully deleted!'
+                ]
+            ];
+    
+            return $this->respond($response);
         } else {
             return $this->failNotFound('Blog dosen`t find!');
         }

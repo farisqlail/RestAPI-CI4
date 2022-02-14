@@ -12,13 +12,6 @@
 
     <h1>Halo</h1>
 
-    <?php foreach ($blogs as $item) : ?>
-
-        <h3><?= $item['blog_title'] ?></h3>
-        <p><?= $item['blog_description'] ?></p>
-
-    <?php endforeach ?>
-
 </body>
 
 </html>

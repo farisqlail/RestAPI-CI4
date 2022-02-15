@@ -23,6 +23,14 @@ class Blogs extends Migration
                 'type' => 'TEXT',
                 'null' => true,
             ],
+            'image' => [
+                'type' => 'VARCHAR',
+                'constraint' => '100'
+            ],
+            'file_path' => [
+                'type' => 'VARCHAR',
+                'constraint' => '100'
+            ]
         ]);
         $this->forge->addKey('blog_id', true);
         $this->forge->createTable('blogs');

@@ -16,8 +16,22 @@ class BlogController extends BaseController
         $blogModel = model(Blog::class);
         $blogs['blogs'] = $blogModel->findAll();
 
-        // echo view('blog/index', $blogs);
-        return $this->response->setJson($blogs);
+        if (!$blogs === null) {
+            $response = [
+                'status' => 200,
+                'error' => null,
+                'data' => $blogs,
+                'messages' => [
+                    'success' => 'List Blogs!'
+                ]
+            ];
+    
+            // echo view('blog/index', $blogs);
+            return $this->respond($response);
+        } else {
+            return $this->failNotFound('Blog dosen`t find!');
+        }
+        
     }
 
     public function create()

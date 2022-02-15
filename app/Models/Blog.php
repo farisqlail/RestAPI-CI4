@@ -14,7 +14,12 @@ class Blog extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['blog_title', 'blog_description'];
+    protected $allowedFields    = [
+        'blog_title', 
+        'blog_description',
+        'file_name',
+        'file_path'
+    ];
 
     // Dates
     protected $useTimestamps = false;

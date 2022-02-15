@@ -9,7 +9,7 @@ class Blogs extends Migration
     public function up()
     {
         $this->forge->addField([
-            'blog_id' => [
+            'id' => [
                 'type'           => 'INT',
                 'constraint'     => 5,
                 'unsigned'       => true,
@@ -23,7 +23,7 @@ class Blogs extends Migration
                 'type' => 'TEXT',
                 'null' => true,
             ],
-            'image' => [
+            'file_name' => [
                 'type' => 'VARCHAR',
                 'constraint' => '100'
             ],
@@ -32,7 +32,7 @@ class Blogs extends Migration
                 'constraint' => '100'
             ]
         ]);
-        $this->forge->addKey('blog_id', true);
+        $this->forge->addKey('id', true);
         $this->forge->createTable('blogs');
 
     }

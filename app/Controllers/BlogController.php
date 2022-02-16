@@ -7,7 +7,7 @@ use CodeIgniter\RESTful\ResourceController;
 use CodeIgniter\API\ResponseTrait;
 use App\Models\Blog;
 
-class BlogController extends BaseController
+class BlogController extends ResourceController
 {
     use ResponseTrait;
 
@@ -86,7 +86,7 @@ class BlogController extends BaseController
     {
 
         $blogModel = model(Blog::class);
-        $blogs = $blogModel->where('blog_id', $id)->first();
+        $blogs = $blogModel->where('id', $id)->first();
 
         if ($blogs) {
             return $this->respond($blogs);

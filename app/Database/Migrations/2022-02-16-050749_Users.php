@@ -30,6 +30,9 @@ class Users extends Migration
             'password' => [
                 'type' => 'VARCHAR',
                 'constraint' => 120
+            ],
+            'created_at' => [
+                'type' => 'timestamp'
             ]
         ]);
 

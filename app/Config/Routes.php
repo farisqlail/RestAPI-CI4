@@ -29,13 +29,18 @@ $routes->setAutoRoute(true);
  * --------------------------------------------------------------------
  */
 
-$routes->get('/', 'BlogController::index');
-$routes->post('/created/blog/', 'BlogController::create');
-$routes->add('/blog/(:any)/', 'BlogController::show/$1');
-$routes->add('/update/blog/(:any)', 'BlogController::update/$1');
-$routes->delete('/delete/blog/(:any)', 'BlogController::delete/$1');
+$routes->group('blog', function ($routes) {
+    $routes->get('blog', 'BlogController::index');
+    $routes->post('create', 'BlogController::create');
+    $routes->add('show/(:any)', 'BlogController::show/$1');
+    $routes->add('update/(:any)', 'BlogController::update/$1');
+    $routes->delete('delete/(:any)', 'BlogController::delete/$1');
+});
 
-
+$routes->group('auth', function ($routes) {
+    $routes->post('register', 'UserController::register');
+    $routes->post('login', 'UserController::login');
+});
 
 
 

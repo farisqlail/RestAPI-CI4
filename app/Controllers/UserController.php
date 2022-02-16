@@ -8,8 +8,9 @@ use Exception;
 use \Firebase\JWT\JWT;
 use App\Models\User;
 use CodeIgniter\API\ResponseTrait;
+use Config\Services;
 
-class UserController extends BaseController
+class UserController extends ResourceController
 {
     use ResponseTrait;
 
@@ -78,11 +79,10 @@ class UserController extends BaseController
         return $this->respondCreated($response);
     }
 
-    private function getKey()
-    {
-
-        return "application_secret";
-    }
+    // private function getKey()
+    // {
+    //     return "application_secret";
+    // }
 
     public function login()
     {
@@ -115,14 +115,14 @@ class UserController extends BaseController
         } else {
 
             $userModel = new User();
-
-            $useData = $userModel->where('email', $this->request->getVar('email'))->first();
+            $email = $this->request->getVar('email');
+            $useData = $userModel->where('email', $email)->first();
 
             if (!empty($userData)) {
                 
                 if (password_verify($this->request->getVar('password'), $useData['password'])) {
                     
-                    $key = $this->getKey();
+                    $key = Services::getSecretKey();
 
                     $iat = time();
                     $nbf = $iat + 10;
@@ -130,7 +130,7 @@ class UserController extends BaseController
 
                     $payload = array(
                         'iss' => 'The_claim',
-                        'aud' => 'The_aud',
+                        'aud' => 'The_Aud',
                         'iat' => $iat,
                         'nbf' => $nbf,
                         'exp' => $exp,
@@ -141,7 +141,7 @@ class UserController extends BaseController
 
                     $response = [
                         'status' => 200,
-                        'error' => null,
+                        'error' => false,
                         'messages' => 'User logged in successfully',
                         'data' => [
                             'token' => $token
@@ -158,7 +158,8 @@ class UserController extends BaseController
                     ];
 
                     return $this->respondCreated($response);
-                }                   
+                }      
+
             } else {
 
                 $response = [

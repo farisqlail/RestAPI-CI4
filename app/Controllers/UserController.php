@@ -5,10 +5,11 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use CodeIgniter\RESTful\ResourceController;
 use Exception;
-use \Firebase\JWT\JWT;
+use Firebase\JWT\JWT;
 use App\Models\User;
 use CodeIgniter\API\ResponseTrait;
 use Config\Services;
+use Firebase\JWT\Key;
 
 class UserController extends ResourceController
 {
@@ -79,7 +80,7 @@ class UserController extends ResourceController
         return $this->respondCreated($response);
     }
 
-    private function getKey()
+    private function getSecretKey()
     {
         return getenv('JWT_SECRET_KEY');
     }
@@ -117,13 +118,13 @@ class UserController extends ResourceController
             $userModel = new User();
             $email = $this->request->getVar('email');
             $userData = $userModel->where('email', $email)->first();
-
+            
             // var_dump($userData);
             if (!empty($userData)) {
 
                 if (password_verify($this->request->getVar('password'), $userData['password'])) {
 
-                    $key = $this->getKey();
+                    $key = $this->getSecretKey();
 
                     $iat = time();
                     $nbf = $iat + 10;
@@ -138,7 +139,8 @@ class UserController extends ResourceController
                         'data' => $userData
                     );
 
-                    $token = JWT::encode($payload, $key, $userData);
+                    // return $this->respondCreated($key);
+                    $token = JWT::encode($payload, $key, 'HS256');
 
                     $response = [
                         'status'    => 200,
@@ -178,13 +180,14 @@ class UserController extends ResourceController
     public function detail()
     {
 
-        $key = $this->getKey();
+        $key = $this->getSecretKey();
         $authHeader = $this->request->getHeader('Authorization');
         $authHeader = $authHeader->getValue();
         $token = $authHeader;
 
+        // return $this->respondCreated($decode);
         try {
-            $decode = JWT::decode($token, $key, array("HS256"));
+            $decode = JWT::decode($token, new Key($key, 'HS256'));
 
             if ($decode) {
 

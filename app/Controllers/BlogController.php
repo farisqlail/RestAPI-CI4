@@ -37,13 +37,36 @@ class BlogController extends ResourceController
     {
 
         $blogModel = model(Blog::class);
+
+        $rules = [
+            'blog_title' => 'required',
+            'blog_description' => 'required',
+        ];
+
+        $massages = [
+            'title' => [
+                'required' => 'Title is required'
+            ],
+            'description' => [
+                'required' => 'Description is required'
+            ],
+        ];
+
         $file = $this->request->getFile('image');
         $blogImage = $file->getName();
 
         $temp = explode(".", $blogImage);
         $newFileName = round(microtime(true)) . '.' . end($temp);
 
-        if ($file->move("blog", $newFileName)) {
+        if (!$this->validate($rules, $massages)) {
+            $response = [
+                'status' => 500,
+                'error' => true,
+                'message' => $this->validator->getErrors()
+            ];
+        } else {
+            
+            $file->move('./uploads', $newFileName);
 
             $data = [
                 'blog_title' => $this->request->getVar('blog_title'),
@@ -53,33 +76,24 @@ class BlogController extends ResourceController
             ];
 
             if ($blogModel->insert($data)) {
+                
                 $response = [
                     'status' => 200,
                     'error' => null,
                     'messages' => [
-                        'success' => 'Blog successfully created!'
+                        'success' => 'Successfully, blog has been created!'
                     ]
                 ];
             } else {
                 $response = [
                     'status' => 500,
-                    'error' => null,
-                    'messages' => [
-                        'success' => 'Blog failed created!'
-                    ]
+                    'error' => true,
+                    'message' => 'Failed to create blog!'
                 ];
             }
-        } else {
-            $response = [
-                'status' => 500,
-                'error' => null,
-                'messages' => [
-                    'success' => 'Blog failed created!'
-                ]
-            ];
         }
 
-        return $this->respondCreated($response);
+        return $this->respond($response);
     }
 
     public function show($id = null)
@@ -89,7 +103,17 @@ class BlogController extends ResourceController
         $blogs = $blogModel->where('id', $id)->first();
 
         if ($blogs) {
-            return $this->respond($blogs);
+
+            $response = [
+                'status' => 200,
+                'error' => null,
+                'data' => $blogs,
+                'messages' => [
+                    'success' => 'Blogs find!'
+                ]
+            ];
+
+            return $this->respond($response);
         } else {
             return $this->failNotFound('Blog dosen`t find!');
         }
@@ -100,13 +124,35 @@ class BlogController extends ResourceController
 
         $blogModel = model(Blog::class);
         $blogs = $blogModel->where('id', $id)->first();
+
+        $rules = [
+            'blog_title' => 'required',
+            'blog_description' => 'required',
+        ];
+
+        $massages = [
+            'title' => [
+                'required' => 'Title is required'
+            ],
+            'description' => [
+                'required' => 'Description is required'
+            ],
+        ];
+        
         $file = $this->request->getFile('image');
         $blogImage = $file->getName();
 
         $temp = explode(".", $blogImage);
         $newFileName = round(microtime(true)) . '.' . end($temp);
 
-        if ($file->move("blog", $newFileName)) {
+        if (!$this->validate($rules, $massages)) {
+            $response = [
+                'status' => 500,
+                'error' => true,
+                'message' => $this->validator->getErrors()
+            ];
+        } else {
+            $file->move('./uploads', $newFileName);
 
             $data = [
                 'blog_title' => $this->request->getVar('blog_title'),
@@ -114,34 +160,24 @@ class BlogController extends ResourceController
                 'file_name' => $newFileName,
                 'file_path' => "/blog/" . $newFileName
             ];
+
             if ($blogModel->update($id, $data)) {
                 $response = [
                     'status' => 200,
                     'error' => null,
                     'messages' => [
-                        'success' => 'Blog successfully updated!'
+                        'success' => 'Successfully, blog has been updated!'
                     ]
                 ];
             } else {
                 $response = [
-                    'status' => 200,
-                    'error' => null,
-                    'messages' => [
-                        'success' => 'Blog failed updated!'
-                    ]
+                    'status' => 500,
+                    'error' => true,
+                    'message' => 'Failed to update blog!'
                 ];
             }
-           
-        } else {
-            $response = [
-                'status' => 200,
-                'error' => null,
-                'messages' => [
-                    'success' => 'Blog failed updated!'
-                ]
-            ];
         }
-        
+
         return $this->respond($response);
     }
 

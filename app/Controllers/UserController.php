@@ -79,10 +79,10 @@ class UserController extends ResourceController
         return $this->respondCreated($response);
     }
 
-    // private function getKey()
-    // {
-    //     return "application_secret";
-    // }
+    private function getKey()
+    {
+        return getenv('JWT_SECRET_KEY');
+    }
 
     public function login()
     {
@@ -103,26 +103,27 @@ class UserController extends ResourceController
         ];
 
         if (!$this->validate($rules, $messages)) {
-            
+
             $response = [
                 'status' => 500,
                 'error' => true,
-                'message' => $this->validator->getError()
+                'message' => $this->validator->getErrors(),
+                'data' => []
             ];
 
             return $this->respondCreated($response);
-
         } else {
 
             $userModel = new User();
             $email = $this->request->getVar('email');
-            $useData = $userModel->where('email', $email)->first();
+            $userData = $userModel->where('email', $email)->first();
 
+            // var_dump($userData);
             if (!empty($userData)) {
-                
-                if (password_verify($this->request->getVar('password'), $useData['password'])) {
-                    
-                    $key = Services::getSecretKey();
+
+                if (password_verify($this->request->getVar('password'), $userData['password'])) {
+
+                    $key = $this->getKey();
 
                     $iat = time();
                     $nbf = $iat + 10;
@@ -137,13 +138,13 @@ class UserController extends ResourceController
                         'data' => $userData
                     );
 
-                    $token = JWT::encode($payload, $key);
+                    $token = JWT::encode($payload, $key, $userData);
 
                     $response = [
-                        'status' => 200,
-                        'error' => false,
-                        'messages' => 'User logged in successfully',
-                        'data' => [
+                        'status'    => 200,
+                        'error'     => false,
+                        'messages'  => 'User logged in successfully',
+                        'data'      => [
                             'token' => $token
                         ]
                     ];
@@ -152,24 +153,62 @@ class UserController extends ResourceController
                 } else {
 
                     $response = [
-                        'status' => 500,
-                        'error' => null,
-                        'messages' => 'Inccorect details'
+                        'status'    => 500,
+                        'error'     => null,
+                        'messages'  => 'Inccorect details',
+                        'data'      => []
                     ];
 
                     return $this->respondCreated($response);
-                }      
-
+                }
             } else {
 
                 $response = [
-                    'status' => 500,
-                    'error' => null,
-                    'messages' => 'User not found'
+                    'status'    => 500,
+                    'error'     => null,
+                    'messages'  => 'User not found',
+                    'data'      => []
                 ];
 
                 return $this->respondCreated($response);
             }
+        }
+    }
+
+    public function detail()
+    {
+
+        $key = $this->getKey();
+        $authHeader = $this->request->getHeader('Authorization');
+        $authHeader = $authHeader->getValue();
+        $token = $authHeader;
+
+        try {
+            $decode = JWT::decode($token, $key, array("HS256"));
+
+            if ($decode) {
+
+                $response = [
+                    'status' => 200,
+                    'error' => false,
+                    'messages' => 'User Detail',
+                    'data' => [
+                        'profile' => $decode
+                    ]
+                ];
+
+                return $this->respondCreated($response);
+            }
+        } catch (\Throwable $th) {
+            
+            $response = [
+                'status' => 401,
+                'error' => true,
+                'messages' => 'Access denied',
+                'data' => []
+            ];
+
+            return $this->respondCreated($response);
         }
     }
 }

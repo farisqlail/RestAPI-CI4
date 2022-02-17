@@ -31,6 +31,6 @@ class Services extends BaseService
 
     public static function getSecretKey()
     {
-        return 'example_key';
+        return getenv('JWT_SECRET_KEY');
     }
 }

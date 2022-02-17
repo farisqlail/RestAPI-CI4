@@ -40,6 +40,7 @@ $routes->group('blog', function ($routes) {
 $routes->group('auth', function ($routes) {
     $routes->post('register', 'UserController::register');
     $routes->post('login', 'UserController::login');
+    $routes->get('profile', 'UserController::detail');
 });
 
 

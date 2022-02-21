@@ -33,6 +33,9 @@ class Users extends Migration
             ],
             'created_at' => [
                 'type' => 'timestamp'
+            ],
+            'role' => [
+                'type' => 'ENUM("admin", "user")',
             ]
         ]);
 

@@ -29,17 +29,25 @@ $routes->setAutoRoute(true);
  * --------------------------------------------------------------------
  */
 
-$routes->group('blog', function ($routes) {
-    $routes->get('blog', 'BlogController::index');
-    $routes->post('create', 'BlogController::create');
-    $routes->add('show/(:any)', 'BlogController::show/$1');
-    $routes->add('update/(:any)', 'BlogController::update/$1');
-    $routes->delete('delete/(:any)', 'BlogController::delete/$1');
+$routes->match(['get', 'post'], 'login', 'UserController::login', ['filter' => 'noauth']);	
+
+$routes->group('admin', ['filter' => 'auth'], function ($routes) {
+    $routes->group('blog', function ($routes) {
+        $routes->get('blog', 'BlogController::index');
+        $routes->post('create', 'BlogController::create');
+        $routes->add('show/(:any)', 'BlogController::show/$1');
+        $routes->add('update/(:any)', 'BlogController::update/$1');
+        $routes->delete('delete/(:any)', 'BlogController::delete/$1');
+    });
+});
+
+$routes->group('user', ['filter' => 'auth'], function ($routes) {
+    $routes->get('page', 'UserController::user');
 });
 
 $routes->group('auth', function ($routes) {
     $routes->post('register', 'UserController::register');
-    $routes->post('login', 'UserController::login');
+    // $routes->post('login', 'UserController::login');
     $routes->get('profile', 'UserController::detail');
 });
 

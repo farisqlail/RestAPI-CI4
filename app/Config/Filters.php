@@ -24,6 +24,8 @@ class Filters extends BaseConfig
         'invalidchars'  => InvalidChars::class,
         'secureheaders' => SecureHeaders::class,
         'authFilter'    => AuthFilter::class,
+        'Auth'          => AuthFilter::class,
+        'Noauth'        => NoauthFilter::class,
     ];
 
     /**
@@ -73,4 +75,6 @@ class Filters extends BaseConfig
             ],
         ],
     ];
+
+    
 }

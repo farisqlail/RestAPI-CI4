@@ -6,10 +6,6 @@ use App\Models\User;
 
 class Userrules
 {
-    // public function custom_rule(): bool
-    // {
-    //     return true;
-    // }
 
     public function validateUser(string $str, string $fields, array $data){
         

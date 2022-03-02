@@ -85,94 +85,113 @@ class UserController extends ResourceController
         return getenv('JWT_SECRET_KEY');
     }
 
+    private function setUserSession($user){
+
+        $data = [
+            'id' => $user['id'],	
+            'name' => $user['name'],
+            'email' => $user['email'],
+            'phone_no' => $user['phone_no'],
+            'role' => $user['role'],
+            'logged_in' => true
+        ];
+
+        session()->set($data);
+        return true;
+    }
+
     public function login()
     {
+        $data = [];
 
-        $rules = [
-            'email' => 'required|valid_email',
-            'password' => 'required'
-        ];
+        if ($this->request->getMethod() == 'post') {
 
-        $messages = [
-            'email' => [
-                'required' => 'Email required',
-                'valid_email' => 'Email addresss is not in format'
-            ],
-            'password' => [
-                'required' => 'Password is required'
-            ]
-        ];
-
-        if (!$this->validate($rules, $messages)) {
-
-            $response = [
-                'status' => 500,
-                'error' => true,
-                'message' => $this->validator->getErrors(),
-                'data' => []
+            $rules = [
+                'email' => 'required|valid_email',
+                'password' => 'required'
             ];
 
-            return $this->respondCreated($response);
-        } else {
+            $messages = [
+                'email' => [
+                    'required' => 'Email required',
+                    'valid_email' => 'Email addresss is not in format'
+                ],
+                'password' => [
+                    'required' => 'Password is required'
+                ]
+            ];
 
-            $userModel = new User();
-            $email = $this->request->getVar('email');
-            $userData = $userModel->where('email', $email)->first();
-            
-            // var_dump($userData);
-            if (!empty($userData)) {
+            if (!$this->validate($rules, $messages)) {
 
-                if (password_verify($this->request->getVar('password'), $userData['password'])) {
+                $response = [
+                    'status' => 500,
+                    'error' => true,
+                    'message' => $this->validator->getErrors(),
+                    'data' => []
+                ];
 
-                    $key = $this->getSecretKey();
+                return $this->respondCreated($response);
+            } else {
 
-                    $iat = time();
-                    $nbf = $iat + 10;
-                    $exp = $iat + 3600;
+                $userModel = new User();
+                $email = $this->request->getVar('email');
+                $userData = $userModel->where('email', $email)->first();
 
-                    $payload = array(
-                        'iss' => 'The_claim',
-                        'aud' => 'The_Aud',
-                        'iat' => $iat,
-                        'nbf' => $nbf,
-                        'exp' => $exp,
-                        'data' => $userData
-                    );
+                // var_dump($userData);
+                if (!empty($userData)) {
 
-                    // return $this->respondCreated($key);
-                    $token = JWT::encode($payload, $key, 'HS256');
+                    if (password_verify($this->request->getVar('password'), $userData['password'])) {
 
-                    $response = [
-                        'status'    => 200,
-                        'error'     => false,
-                        'messages'  => 'User logged in successfully',
-                        'data'      => [
-                            'token' => $token
-                        ]
-                    ];
+                        $key = $this->getSecretKey();
+                        
+                        $iat = time();
+                        $nbf = $iat + 10;
+                        $exp = $iat + 3600;
 
-                    return $this->respondCreated($response);
+                        $payload = array(
+                            'iss' => 'The_claim',
+                            'aud' => 'The_Aud',
+                            'iat' => $iat,
+                            'nbf' => $nbf,
+                            'exp' => $exp,
+                            'data' => $userData
+                        );
+
+                        // return $this->respondCreated($key);
+                        $token = JWT::encode($payload, $key, 'HS256');
+                        
+                        $response = [
+                            'status'    => 200,
+                            'error'     => false,
+                            'messages'  => 'Admin logged in successfully',
+                            'data'      => [
+                                'token' => $token
+                            ]
+                        ];
+
+                        return $this->respondCreated($response);
+                    } else {
+
+                        $response = [
+                            'status'    => 500,
+                            'error'     => null,
+                            'messages'  => 'Inccorect details',
+                            'data'      => []
+                        ];
+
+                        return $this->respondCreated($response);
+                    }
                 } else {
 
                     $response = [
                         'status'    => 500,
                         'error'     => null,
-                        'messages'  => 'Inccorect details',
+                        'messages'  => 'User not found',
                         'data'      => []
                     ];
 
                     return $this->respondCreated($response);
                 }
-            } else {
-
-                $response = [
-                    'status'    => 500,
-                    'error'     => null,
-                    'messages'  => 'User not found',
-                    'data'      => []
-                ];
-
-                return $this->respondCreated($response);
             }
         }
     }
@@ -203,7 +222,7 @@ class UserController extends ResourceController
                 return $this->respondCreated($response);
             }
         } catch (\Throwable $th) {
-            
+
             $response = [
                 'status' => 401,
                 'error' => true,

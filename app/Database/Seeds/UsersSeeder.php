@@ -16,12 +16,14 @@ class UsersSeeder extends Seeder
                 'name' => 'Admin',
                 'email' => 'admin@gmail.com',
                 'phone_no' => '0123456789',
+                'role' => 'admin',
                 'password' => password_hash('admin', PASSWORD_DEFAULT),
             ],
             [
                 'name' => 'User',
                 'email' => 'user@gmail.com',
                 'phone_no' => '0123456789',
+                'role' => 'user',
                 'password' => password_hash('user', PASSWORD_DEFAULT),
             ]
         ]);
